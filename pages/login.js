@@ -1,0 +1,30 @@
+import {getProviders, signIn, useSession} from "next-auth/react"
+import { useRouter } from "next/router";
+
+export default function LoginPage({providers}){
+    const { data: session, status } = useSession();
+    const router = useRouter();
+    if(status == 'loading'){
+        return '';
+    }
+    if(session){
+        router.push('/');
+    }
+    return (<div className="min-h-screen flex items-center justify-center">
+        {Object.values(providers).map((provider) => (
+            <div key={provider.id}>
+                <button onClick={async () => {await signIn(provider.id)}} className="bg-twitterWhite pl-3 pr-5 py-2 text-black rounded-full flex items-center">
+                <img src="/google.png" alt = "" className="h-5 pr-2"/>
+                Sign in with {provider.name}
+                </button>
+            </div>
+        ))}
+    </div>);
+}
+
+export async function getServerSideProps(){
+    const providers = await getProviders();
+    return {
+        props: {providers},
+    }; 
+}
